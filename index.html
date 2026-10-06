@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Étudiants</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            margin-top: 2.5rem;
+            border-top: 2px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 0.65rem 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .input-error {
+            border-color: var(--danger-color) !important;
+            background-color: #fef2f2;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .stats-card {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .row-highlight {
+            background-color: #e0e7ff !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-modifier { background-color: var(--warning-color); }
+        .btn-supprimer { background-color: var(--danger-color); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Saisie des informations</h1>
+        <form id="form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="num">Numéro</label>
+                    <input type="number" id="num" name="num" placeholder="Ex: 101">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nomprenom">Nom et Prénom</label>
+                    <input type="text" id="nomprenom" placeholder="Ex: Hiba Fadili">
+                </div>
+
+                <div class="form-group">
+                    <label for="note1">Note 1 (0 - 20)</label>
+                    <input type="number" id="note1" min="0" max="20" step="0.25" placeholder="0 à 20">
+                </div>
+
+                <div class="form-group">
+                    <label for="note2">Note 2 (0 - 20)</label>
+                    <input type="number" id="note2" min="0" max="20" step="0.25" placeholder="0 à 20">
+                </div>
+
+                <div class="form-group">
+                    <label for="module">Module</label>
+                    <select id="module">
+                        <option value="POO">POO</option>
+                        <option value="Python">Python</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" id="btn" class="btn-submit" onclick="ajouter()">Ajouter</button>
+
+            <h2>Liste des étudiants</h2>
+            <div class="table-responsive">
+                <table id="tablehtml">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Nom et Prénom</th>
+                            <th>Note 1</th>
+                            <th>Note 2</th>
+                            <th>Module</th>
+                            <th>Moyenne</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyhtml">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="stats-card">
+                Moyenne Générale de la classe : <span id="moyenneGenerale">-- / 20</span>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let indice = -1;
+        const formElement = document.getElementById("form");
+        const note1Input = document.getElementById('note1');
+        const note2Input = document.getElementById('note2');
+
+        formElement.addEventListener("submit", function(e) {
+            e.preventDefault();
+        });
+
+        [note1Input, note2Input].forEach(input => {
+            input.addEventListener('input', function() {
+                const val = parseFloat(this.value);
+                if (val < 0 || val > 20) {
+                    this.classList.add('input-error');
+                } else {
+                    this.classList.remove('input-error');
+                }
+            });
+        });
+
+        formElement.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                ajouter();
+            }
+        });
+
+        function ajouter() {
+            let numero = document.getElementById('num').value.trim();
+            let nomprenom = document.getElementById('nomprenom').value.trim();
+            let note1 = note1Input.value;
+            let note2 = note2Input.value;
+            let module = document.getElementById('module').value;
+            let tbody = document.getElementById("tbodyhtml");
+
+            if (!numero || !nomprenom || note1 === "" || note2 === "") {
+                alert("Veuillez remplir tous les champs !");
+                return;
+            }
+
+            if (Number(note1) < 0 || Number(note1) > 20 || Number(note2) < 0 || Number(note2) > 20) {
+                alert("Les notes doivent être comprises entre 0 et 20 !");
+                return;
+            }
+
+            let moyenneEleve = ((Number(note1) + Number(note2)) / 2).toFixed(2);
+
+            if (indice === -1) {
+                let tr = document.createElement("tr");
+
+                tr.addEventListener('mouseover', function() {
+                    tr.classList.add('row-highlight');
+                });
+                tr.addEventListener('mouseout', function() {
+                    tr.classList.remove('row-highlight');
+                });
+
+                tr.innerHTML = `
+                    <td>${numero}</td>
+                    <td>${nomprenom}</td>
+                    <td>${note1}</td>
+                    <td>${note2}</td>
+                    <td>${module}</td>
+                    <td><strong>${moyenneEleve}</strong></td>
+                    <td class="actions-cell">
+                        <button type="button" class="btn-action btn-modifier" onclick="modifier(this)">Modifier</button>
+                        <button type="button" class="btn-action btn-supprimer" onclick="supprimer(this)">Supprimer</button>
+                    </td>`;
+                tbody.appendChild(tr);
+            } else {
+                let tr = document.getElementById("tablehtml").rows[indice];
+                tr.cells[0].textContent = numero;
+                tr.cells[1].textContent = nomprenom;
+                tr.cells[2].textContent = note1;
+                tr.cells[3].textContent = note2;
+                tr.cells[4].textContent = module;
+                tr.cells[5].innerHTML = `<strong>${moyenneEleve}</strong>`;
+                
+                indice = -1;
+                document.getElementById("btn").textContent = "Ajouter";
+            }
+
+            document.getElementById('num').value = "";
+            document.getElementById('nomprenom').value = "";
+            note1Input.value = "";
+            note2Input.value = "";
+            document.getElementById('module').value = "POO";
+
+            calculerMoyenneGenerale();
+        }
+
+        function modifier(btn1) {
+            let tr = btn1.parentElement.parentElement;
+            document.getElementById('num').value = tr.cells[0].textContent;
+            document.getElementById('nomprenom').value = tr.cells[1].textContent;
+            note1Input.value = tr.cells[2].textContent;
+            note2Input.value = tr.cells[3].textContent;
+            document.getElementById('module').value = tr.cells[4].textContent;
+            
+            indice = tr.rowIndex;
+            document.getElementById("btn").textContent = "Enregistrer la modification";
+        }
+
+        function supprimer(btn2) {
+            if (confirm("Voulez-vous vraiment supprimer cet étudiant ?")) {
+                let tr = btn2.parentElement.parentElement;
+                tr.remove();
+                calculerMoyenneGenerale();
+            }
+        }
+
+        function calculerMoyenneGenerale() {
+            let tbody = document.getElementById("tbodyhtml");
+            let rows = tbody.getElementsByTagName("tr");
+            
+            if (rows.length === 0) {
+                document.getElementById("moyenneGenerale").textContent = "-- / 20";
+                return;
+            }
+
+            let somme = 0;
+            for (let i = 0; i < rows.length; i++) {
+                somme += parseFloat(rows[i].cells[5].textContent);
+            }
+
+            let avg = (somme / rows.length).toFixed(2);
+            document.getElementById("moyenneGenerale").textContent = `${avg} / 20`;
+        }
+    </script>
+</body>
+</html>
